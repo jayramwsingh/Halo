@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07070B">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="A verified 21+ community for friendship, dating and marriage. Group-first, in public places.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%2307070B'/%3E%3Ccircle cx='32' cy='32' r='15' fill='none' stroke='%23FF8A5B' stroke-width='5'/%3E%3Ccircle cx='46' cy='18' r='5' fill='%23FFC670'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<title>Halo · Meet properly</title>
+<!--
+  PROTOTYPE: waitlist page + interactive demo. Everything shown is PLANNED, not live.
+  SECTIONS: 1 STYLES · 2 LANDING MARKUP · 3 DEMO OVERLAY · 4 HELPERS · 5 LANDING SCRIPT · 6 DEMO DATA · 7 DEMO STATE · 8 DEMO SCREENS · 9 DEMO EVENTS
+  CONFIG: change the brand in ONE place. Add your WhatsApp number (country code, no +) to receive waitlist messages.
+  SAFETY: 21+ only (self-declared in demo). Fictional people only. No uploads, no verification, no server. Nothing leaves the device.
+-->
+<style>
+/* ============ 1. STYLES ============ */
+:root{--bg:#07070B;--s1:rgba(255,255,255,.045);--s2:rgba(255,255,255,.08);--ln:rgba(255,255,255,.1);--tx:#F4F1EC;--mu:#9B98A6;--co:#FF8A5B;--am:#FFC670;--vi:#8B7CFF;--mi:#3DD6C6;--ro:#FF6B8B;--g:linear-gradient(120deg,#FF8A5B,#FFC670);--ease:cubic-bezier(.2,.7,.2,1);
+ --serif:"Instrument Serif",Georgia,"Times New Roman",serif;--sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);font-size:16px;line-height:1.55;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+.aurora{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.aurora i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;animation:drift 18s ease-in-out infinite alternate}
+.aurora i:nth-child(1){width:420px;height:420px;background:#FF8A5B;top:-120px;right:-100px;opacity:.28}
+.aurora i:nth-child(2){width:480px;height:480px;background:#6C5CE7;bottom:-180px;left:-160px;opacity:.3;animation-delay:-6s}
+.aurora i:nth-child(3){width:300px;height:300px;background:#3DD6C6;top:45%;left:55%;opacity:.12;animation-delay:-12s}
+@keyframes drift{to{transform:translate(60px,-40px) scale(1.15)}}
+.prog{position:fixed;top:0;left:0;right:0;height:3px;background:var(--g);transform:scaleX(0);transform-origin:0 50%;z-index:30}
+.wrap{max-width:680px;margin:0 auto;padding:0 20px}
+h1,h2,h3,.serif{font-family:var(--serif);font-weight:400;letter-spacing:-.01em}
+h1{font-size:clamp(46px,12vw,76px);line-height:.98}
+h2{font-size:clamp(34px,8vw,48px);line-height:1.04;margin-bottom:10px}
+h3{font-family:var(--sans);font-weight:600;font-size:17px;margin-bottom:4px;letter-spacing:0}
+em{font-style:italic;background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:.05em}
+.sub{color:var(--mu);font-size:16px}
+svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+button{font:inherit;color:inherit;border:0;border-radius:16px;padding:13px 22px;font-weight:600;cursor:pointer;min-height:48px;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s var(--ease),box-shadow .3s,background .3s,border-color .3s;position:relative;overflow:hidden}
+button:active{transform:scale(.96)}
+.btn{background:var(--g);color:#1a0f08;box-shadow:0 10px 30px rgba(255,138,91,.32)}
+.btn::after{content:"";position:absolute;top:0;left:-70%;width:50%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);transition:left .6s var(--ease)}
+.btn:hover::after{left:130%}
+.btn:hover{box-shadow:0 14px 38px rgba(255,138,91,.5);transform:translateY(-1px)}
+.btn2{background:var(--s1);border:1px solid var(--ln);backdrop-filter:blur(10px)}
+.btn2:hover{background:var(--s2);border-color:rgba(255,255,255,.22)}
+.btnt{background:rgba(61,214,198,.12);color:var(--mi);border:1px solid rgba(61,214,198,.25)}
+.btnr{background:rgba(255,107,139,.12);color:var(--ro);border:1px solid rgba(255,107,139,.25)}
+button[disabled]{opacity:.45;cursor:default;box-shadow:none;transform:none}
+.full{width:100%}
+/* nav */
+.bar{position:sticky;top:0;z-index:20;background:rgba(7,7,11,.6);backdrop-filter:blur(18px);border-bottom:1px solid var(--ln)}
+.bar .wrap{display:flex;align-items:center;justify-content:space-between;padding-top:10px;padding-bottom:10px}
+.logo{display:flex;align-items:center;gap:9px;font-family:var(--serif);font-size:26px;letter-spacing:.01em}
+.bar button{min-height:40px;padding:8px 18px;font-size:14px}
+/* reveal */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease),transform .9s var(--ease);transition-delay:var(--d,0s)}
+.rv.in{opacity:1;transform:none}
+/* hero */
+.hero{padding:54px 0 36px;position:relative}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;font-size:13px;font-weight:600;color:var(--am);background:rgba(255,198,112,.08);border:1px solid rgba(255,198,112,.22);padding:6px 14px;border-radius:99px;margin-bottom:22px}
+.eyebrow b{width:7px;height:7px;border-radius:50%;background:var(--mi);box-shadow:0 0 0 0 rgba(61,214,198,.6);animation:ping 2s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 9px rgba(61,214,198,0)}100%{box-shadow:0 0 0 0 rgba(61,214,198,0)}}
+.lead{font-size:18px;color:#cfccd6;margin:20px 0 26px;max-width:30em}
+.cta{display:flex;gap:10px;flex-wrap:wrap}
+.orbit{position:relative;width:min(340px,86vw);aspect-ratio:1;margin:46px auto 0}
+.orbit .r{position:absolute;inset:0;border-radius:50%;border:1px solid var(--ln);animation:spin 40s linear infinite}
+.orbit .r2{inset:14%;animation-duration:28s;animation-direction:reverse;border-color:rgba(255,198,112,.25)}
+.orbit .r3{inset:30%;animation-duration:20s;border-color:rgba(139,124,255,.35)}
+.orbit .r::after{content:"";position:absolute;top:-5px;left:50%;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:var(--g);box-shadow:0 0 18px var(--co)}
+.orbit .r2::after{background:var(--vi);box-shadow:0 0 16px var(--vi)}
+.orbit .r3::after{background:var(--mi);box-shadow:0 0 16px var(--mi)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.core{position:absolute;inset:38%;border-radius:50%;display:grid;place-items:center;background:var(--s2);border:1px solid var(--ln);backdrop-filter:blur(12px);box-shadow:0 0 60px rgba(255,138,91,.35);animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.07);box-shadow:0 0 90px rgba(255,138,91,.5)}}
+.fchip{position:absolute;font-size:12.5px;font-weight:600;padding:8px 13px;border-radius:99px;background:rgba(20,20,28,.8);border:1px solid var(--ln);backdrop-filter:blur(10px);white-space:nowrap;animation:float 6s ease-in-out infinite}
+.fchip.a{top:4%;left:-4%}.fchip.b{top:64%;right:-6%;animation-delay:-2s}.fchip.c{bottom:2%;left:6%;animation-delay:-4s}
+@keyframes float{50%{transform:translateY(-12px)}}
+/* marquee */
+.mq{overflow:hidden;border-block:1px solid var(--ln);margin:34px 0 0;padding:14px 0;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.mq div{display:flex;gap:44px;width:max-content;animation:mq 26s linear infinite;color:var(--mu);font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.mq span::before{content:"✦";color:var(--co);margin-right:44px}
+@keyframes mq{to{transform:translateX(-50%)}}
+/* sections */
+.sec{padding:76px 0}
+.grid{display:grid;gap:12px;margin-top:26px}.g2{grid-template-columns:1fr 1fr}
+@media(max-width:440px){.g2{grid-template-columns:1fr}}
+.card{background:var(--s1);border:1px solid var(--ln);border-radius:24px;padding:20px;position:relative;overflow:hidden;transition:transform .4s var(--ease),border-color .3s,opacity .9s var(--ease)}
+.card::before{content:"";position:absolute;inset:0;background:radial-gradient(260px circle at var(--x,50%) var(--y,0%),rgba(255,138,91,.16),transparent 70%);opacity:0;transition:opacity .3s;pointer-events:none}
+.card:hover{border-color:rgba(255,255,255,.2)}.card:hover::before{opacity:1}
+.card.in:hover{transform:translateY(-4px)}
+.card p{font-size:14.5px;color:var(--mu)}
+.num{width:38px;height:38px;border-radius:12px;background:var(--g);color:#1a0f08;display:grid;place-items:center;font-weight:700;margin-bottom:12px}
+.ico{width:46px;height:46px;border-radius:15px;background:rgba(255,138,91,.12);color:var(--co);display:grid;place-items:center;margin-bottom:12px;transition:transform .4s var(--ease)}
+.card:hover .ico{transform:rotate(-8deg) scale(1.1)}
+.list{list-style:none;margin-top:16px}
+.list li{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--ln);font-size:15px}
+.list li:first-child{border-top:0}.list svg{color:var(--mi);margin-top:2px}
+.honest{border:1px dashed rgba(255,198,112,.5);border-radius:22px;padding:20px;margin-top:20px;background:rgba(255,198,112,.05)}
+.honest p{color:#cfccd6;font-size:14.5px}
+.tier{display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-top:1px solid var(--ln);font-size:15px}
+.tier:first-child{border-top:0}.tier b{color:var(--am)}
+details{border-top:1px solid var(--ln);padding:16px 0}
+details:first-of-type{border-top:0}
+summary{font-weight:600;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:10px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--co);font-size:24px;line-height:1;transition:transform .35s var(--ease)}
+details[open] summary::after{transform:rotate(45deg)}
+details p{margin-top:10px;color:var(--mu);font-size:14.5px;animation:up .5s var(--ease)}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:4px 11px;border-radius:99px;background:rgba(255,198,112,.1);color:var(--am);margin:6px 6px 0 0}
+.tag.t{background:rgba(61,214,198,.1);color:var(--mi)}
+/* forms */
+label{display:block;font-weight:600;font-size:13.5px;margin:16px 0 7px;color:#d9d6e0}
+input,select,textarea{font:inherit;width:100%;padding:14px 15px;border:1px solid var(--ln);border-radius:15px;background:rgba(255,255,255,.04);color:var(--tx);transition:border-color .25s,box-shadow .25s,background .25s}
+input::placeholder{color:#6f6c7a}
+input:focus{outline:0;border-color:var(--co);box-shadow:0 0 0 4px rgba(255,138,91,.15);background:rgba(255,255,255,.06)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.chip{background:var(--s1);border:1px solid var(--ln);color:var(--tx);padding:9px 16px;min-height:42px;border-radius:99px;font-size:14px;font-weight:500}
+.chip:hover{border-color:rgba(255,255,255,.28)}
+.chip.on{background:var(--g);color:#1a0f08;border-color:transparent;font-weight:600;animation:pop .35s var(--ease)}
+@keyframes pop{40%{transform:scale(1.08)}}
+.check{display:flex;gap:11px;align-items:flex-start;font-weight:400;font-size:14px;margin-top:16px;color:var(--mu)}
+.check input{width:22px;height:22px;flex:none;accent-color:#FF8A5B;margin-top:1px}
+.err{color:var(--ro);font-size:14px;margin-top:10px}
+.msgbox{background:rgba(0,0,0,.4);border-radius:16px;padding:14px;font-size:14px;white-space:pre-wrap;margin-top:12px;border:1px solid var(--ln);animation:up .5s var(--ease)}
+footer{padding:40px 0 56px;font-size:13px;color:var(--mu);border-top:1px solid var(--ln)}
+footer p{margin-top:8px}
+@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+/* ============ 3. DEMO ============ */
+#demo{position:fixed;inset:0;z-index:50;background:rgba(3,3,6,.85);backdrop-filter:blur(14px);display:flex;justify-content:center;animation:fade .35s}
+#demo[hidden]{display:none}
+@keyframes fade{from{opacity:0}}
+.phone{width:100%;max-width:430px;background:#0B0B12;display:flex;flex-direction:column;position:relative;overflow:hidden;animation:rise .6s var(--ease)}
+@keyframes rise{from{opacity:0;transform:translateY(40px) scale(.97)}}
+@media(min-width:600px){#demo{align-items:center}.phone{height:min(860px,94vh);border-radius:42px;border:1px solid var(--ln);box-shadow:0 40px 120px rgba(0,0,0,.7),0 0 80px rgba(255,138,91,.12)}}
+.dh{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--ln)}
+.dh button{min-height:38px;padding:6px 14px;font-size:13px}
+#dview{flex:1;overflow:auto;padding:18px 16px 24px}
+#dview h1{font-size:40px;margin-bottom:4px}
+#dview.enter>*{animation:up .6s var(--ease) both;animation-delay:calc(var(--i,0)*55ms)}
+#dnav{display:flex;border-top:1px solid var(--ln);background:rgba(11,11,18,.9);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+#dnav button{flex:1;background:none;color:var(--mu);flex-direction:column;gap:2px;font-size:10px;min-height:52px;padding:6px 0;border-radius:14px;font-weight:500}
+#dnav button.on{color:var(--am);background:rgba(255,198,112,.09)}
+#dnav button.on svg{animation:pop .45s var(--ease)}
+.dots{display:flex;gap:6px;margin-bottom:18px}
+.dots i{flex:1;height:4px;border-radius:4px;background:var(--s2);overflow:hidden}.dots i.on{background:var(--g)}
+.dc{background:var(--s1);border:1px solid var(--ln);border-radius:22px;padding:15px;margin-bottom:12px;transition:border-color .3s}
+.dc:hover{border-color:rgba(255,255,255,.2)}
+.row{display:flex;gap:12px;align-items:center}.grow{flex:1;min-width:0}
+.meta{color:var(--mu);font-size:13px}
+.av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#1a0f08;flex:none;background:linear-gradient(135deg,var(--a),var(--b));border:3px solid var(--rc,transparent);box-shadow:0 0 0 1px var(--ln)}
+.av.xl{width:96px;height:96px;font-size:30px;margin:0 auto 10px;border-width:4px;animation:breathe 4s ease-in-out infinite}
+.art{width:100%;aspect-ratio:1;border-radius:14px;display:block}
+.artrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.wm{position:relative;overflow:hidden;border-radius:14px}.wm .art{transition:transform .5s var(--ease)}.wm:hover .art{transform:scale(1.08)}
+.wmk{position:absolute;inset:0;pointer-events:none;opacity:.5}
+.mcard{background:linear-gradient(150deg,rgba(255,138,91,.2),rgba(139,124,255,.18) 60%,rgba(11,11,18,.6));border:1px solid rgba(255,198,112,.5);border-radius:26px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden}
+.mcard::after{content:"";position:absolute;top:-50%;left:-60%;width:40%;height:200%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.14),transparent);transform:rotate(18deg);animation:sheen 4.5s ease-in-out infinite;pointer-events:none}
+@keyframes sheen{to{left:140%}}
+.mcard.done{animation:glow 2.6s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 44px rgba(255,198,112,.35)}}
+.code{font-family:var(--serif);font-size:38px;color:var(--am);margin:6px 0 10px;line-height:1.1}
+.ring{display:flex;gap:8px;margin-top:8px}
+.ring button{flex:1;min-height:42px;padding:6px;font-size:13px;background:rgba(0,0,0,.3);border:2px solid var(--c);color:var(--tx)}
+.ring button.on{background:var(--c);color:#111;font-weight:700}
+.check2{display:flex;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--ln);font-size:14.5px;cursor:pointer;background:none;width:100%;text-align:left;border-radius:0;min-height:46px;font-weight:400}
+.check2:first-of-type{border-top:0}
+.box{width:25px;height:25px;border-radius:9px;border:2px solid var(--mu);display:grid;place-items:center;flex:none;transition:all .3s var(--ease)}
+.check2.on .box{background:var(--mi);border-color:var(--mi);color:#06201d;transform:scale(1.08)}
+.bar2{height:8px;border-radius:8px;background:var(--s2);margin:10px 0;overflow:hidden}.bar2 i{display:block;height:100%;background:var(--g);border-radius:8px}
+#dview.enter .bar2 i{animation:grow 1.1s var(--ease)}
+@keyframes grow{from{width:0}}
+#dsheet .bg{position:absolute;inset:0;background:rgba(3,3,6,.7);backdrop-filter:blur(6px);display:flex;align-items:flex-end;z-index:5}
+#dsheet .bg.anim{animation:fade .3s}
+#dsheet .sh{width:100%;background:#12121b;border-radius:30px 30px 0 0;padding:10px 18px 24px;max-height:90%;overflow:auto;border:1px solid var(--ln);border-bottom:0}
+#dsheet .bg.anim .sh{animation:sheet .5s var(--ease)}
+@keyframes sheet{from{transform:translateY(100%)}}
+#dsheet .sh::before{content:"";display:block;width:42px;height:4px;border-radius:4px;background:var(--s2);margin:0 auto 14px}
+.dtoast{position:absolute;left:50%;bottom:86px;transform:translateX(-50%);background:var(--tx);color:#111;font-size:14px;font-weight:600;padding:11px 18px;border-radius:99px;z-index:9;max-width:92%;text-align:center;animation:toast .45s var(--ease);box-shadow:0 12px 36px rgba(0,0,0,.5)}
+@keyframes toast{from{opacity:0;transform:translate(-50%,20px) scale(.9)}}
+.big{font-family:var(--serif);font-size:72px;line-height:1;background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center;margin:8px 0 14px}
+.sos{background:var(--ro);color:#fff;width:100%;min-height:58px;font-size:17px;box-shadow:0 12px 32px rgba(255,107,139,.35);animation:sosp 2.4s infinite}
+@keyframes sosp{70%{box-shadow:0 0 0 14px rgba(255,107,139,0)}}
+.bub{max-width:82%;padding:9px 13px;border-radius:18px 18px 18px 6px;margin:7px 0;background:var(--s2);font-size:14.5px;animation:pop .35s var(--ease)}
+.bub.me{margin-left:auto;background:var(--g);color:#1a0f08;border-radius:18px 18px 6px 18px}
+.bub.me .meta{color:#4a2a14}
+.stk{display:flex;gap:6px;overflow:auto;padding:6px 0}
+.stk button{flex:none;background:var(--s1);border:1px solid var(--ln);min-height:44px;padding:6px 14px;font-size:13px;border-radius:14px}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation-duration:.001s!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001s!important;transition-delay:0s!important;scroll-behavior:auto!important}
+ .rv{opacity:1;transform:none}.mq div{animation:none}}
+</style>
+</head>
+<body>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="prog" id="prog"></div>
+<!-- ============ 2. LANDING MARKUP ============ -->
+<div class="bar"><div class="wrap">
+  <div class="logo"><span data-mark="28"></span><span data-brand>Halo</span></div>
+  <button class="btn" data-go="#join">Request access</button>
+</div></div>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow rv"><b></b>Private beta · 21+ · Verified members</div>
+  <h1 class="rv" style="--d:.08s">Meet people,<br><em>properly.</em></h1>
+  <p class="lead rv" style="--d:.16s"><b data-brand>Halo</b> is a verified community for friendship, dating and marriage. Group-first, in public places, with safety built into every step.</p>
+  <div class="cta rv" style="--d:.24s"><button class="btn" data-go="#join">Join the waitlist</button><button class="btn2" data-open-demo>Try the demo</button></div>
+  <div class="orbit rv" style="--d:.3s" aria-hidden="true"><i class="r r1"></i><i class="r r2"></i><i class="r r3"></i><div class="core"><span data-mark="46"></span></div><span class="fchip a">✓ Face verified</span><span class="fchip b">Meet code · Ember-Lark</span><span class="fchip c">Public venue · 5 people</span></div>
+</div>
+<div class="mq" aria-hidden="true"><div id="mq"></div></div></header>
+
+<section class="sec" id="how"><div class="wrap">
+  <h2 class="rv">How it <em>works</em></h2><p class="sub rv">Four steps. No rush.</p>
+  <div class="grid g2">
+    <div class="card rv"><div class="num">1</div><h3>Verify</h3><p>Live selfie, age check and a real-face photo. One person, one ID.</p></div>
+    <div class="card rv" style="--d:.08s"><div class="num">2</div><h3>Set your intent</h3><p>Friendship, dating or marriage, plus three quick questions so conversations start well.</p></div>
+    <div class="card rv" style="--d:.16s"><div class="num">3</div><h3>Join a meetup</h3><p>Coffee, games, an art walk. Small groups of 4 to 6, in public places.</p></div>
+    <div class="card rv" style="--d:.24s"><div class="num">4</div><h3>Meet Card</h3><p>Show your code, tap "We met", and your ring colour updates. Change it any time.</p></div>
+  </div>
+</div></section>
+
+<section class="sec" id="safe"><div class="wrap">
+  <h2 class="rv">Safety, <em>from day one</em></h2><p class="sub rv">This is the plan. The pilot will build it.</p>
+  <ul class="list rv" id="safeList"></ul>
+  <div class="honest rv"><h3>What we do not promise</h3>
+    <p>We cannot block every screenshot (the Android app will, iPhone cannot), so photos carry the viewer's name as a watermark. We cannot promise anyone is 100% safe, so stay careful, especially on first meets. And we cannot promise zero bots. We remove them continuously.</p></div>
+</div></section>
+
+<section class="sec" id="intent"><div class="wrap">
+  <h2 class="rv">What are you <em>looking for?</em></h2>
+  <div class="grid">
+    <div class="card rv"><h3>Friendship</h3><p>Meetups, art, games, trips. New people without pressure.</p></div>
+    <div class="card rv" style="--d:.08s"><h3>Dating</h3><p>Meet in a group first, then go further. No explicit content, and no photos or video in chat.</p></div>
+    <div class="card rv" style="--d:.16s"><h3>Marriage <span class="tag t">both 21+</span></h3><p>Both verified, both 21 or older. Includes a guide to court marriage and, later, verified lawyers.</p></div>
+  </div>
+</div></section>
+
+<section class="sec" id="feat"><div class="wrap">
+  <h2 class="rv">What makes it <em>different</em></h2>
+  <div class="grid g2" id="featGrid"></div>
+</div></section>
+
+<section class="sec" id="creator"><div class="wrap">
+  <h2 class="rv">Creator <em>Circle</em></h2>
+  <p class="sub rv">Bring your people. Only <b>verified, active</b> members count. We reward trust, not volume.</p>
+  <div class="card rv" style="margin-top:22px">
+    <div class="tier"><span>5 verified, active members</span><b>1 month free</b></div>
+    <div class="tier"><span>25 verified, active members</span><b>6 months free</b></div>
+    <div class="tier"><span>Monthly top 3</span><b>1 year free</b></div>
+    <div class="tier"><span>Top 1 (while rules are followed)</span><b>Lifetime free</b></div>
+  </div>
+  <ul class="list rv">
+    <li><svg class="i" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg><span>A member counts after 14 to 30 days of activity. Fake or reported accounts never count.</span></li>
+    <li><svg class="i" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg><span>No payment per match, so nobody is pushed into dates.</span></li>
+    <li><svg class="i" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg><span>Promotions must be marked #ad. Creators get priority safety support.</span></li>
+  </ul>
+  <button class="btn full rv" style="margin-top:18px" data-go="#join" data-role="creator">Apply as a creator</button>
+</div></section>
+
+<section class="sec" id="faq"><div class="wrap">
+  <h2 class="rv">Questions</h2>
+  <div style="margin-top:14px" class="rv">
+    <details><summary>Is this a hookup app?</summary><p>No. It is for friendship, dating and marriage. Explicit content or solicitation means a permanent ban. We cannot control what two adults do offline, so our promise covers what happens inside the app.</p></details>
+    <details><summary>Will my Aadhaar be stored?</summary><p>Plan: no. Verification would run through DigiLocker or a licensed partner, with your consent, and only the "verified" result is kept. This is planned, not live.</p></details>
+    <details><summary>Under 21?</summary><p>Not for now. The pilot is for 21 and over only.</p></details>
+    <details><summary>Where does my waitlist data go?</summary><p>Nowhere from this page. The form writes a WhatsApp message that you send yourself. Anything you type in the demo stays on your device.</p></details>
+    <details><summary>Is chat free?</summary><p>Plan: yes, text chat inside the app is free after a match. No photos, video or files.</p></details>
+    <details><summary>When do you launch?</summary><p>First a small pilot in one city. No date yet.</p></details>
+  </div>
+</div></section>
+
+<section class="sec" id="join"><div class="wrap">
+  <h2 class="rv">Request <em>access</em></h2><p class="sub rv">One city first, small groups. Fill this in and we will be in touch.</p>
+  <form class="card rv" id="wl" autocomplete="off" style="margin-top:22px">
+    <label for="wn" style="margin-top:0">Name or nickname</label><input id="wn" maxlength="30" required>
+    <label for="wc">City</label><input id="wc" maxlength="40" required>
+    <label for="wa">Age</label><input id="wa" type="number" min="1" max="99" inputmode="numeric" required>
+    <label>I am a</label>
+    <div class="chips" id="wrole"><button type="button" class="chip on" data-role="Member">Member</button><button type="button" class="chip" data-role="Creator">Creator</button><button type="button" class="chip" data-role="Venue partner">Venue partner</button><button type="button" class="chip" data-role="Legal partner">Legal partner</button></div>
+    <label>I want</label>
+    <div class="chips" id="wint"><button type="button" class="chip" data-i="Friendship">Friendship</button><button type="button" class="chip" data-i="Dating">Dating</button><button type="button" class="chip" data-i="Marriage">Marriage</button></div>
+    <label class="check"><input type="checkbox" id="wk" required><span>I understand this creates a WhatsApp message, sent from my own WhatsApp, containing my name, city and age.</span></label>
+    <div class="err" id="werr" role="alert"></div>
+    <button class="btn full" style="margin-top:16px">Create WhatsApp message</button>
+    <div id="wout"></div>
+  </form>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="logo"><span data-mark="24"></span><span data-brand>Halo</span></div>
+  <p>Prototype. Working name, not yet cleared. Every feature shown is planned. The demo contains fictional people only.</p>
+  <p>Grievance Officer: <i>name and email will be added before launch.</i></p>
+</div></footer>
+
+<div id="demo" hidden><div class="phone" role="dialog" aria-modal="true" aria-label="Demo">
+  <div class="dh"><div class="logo" style="font-size:22px"><span data-mark="22"></span><span data-brand>Halo</span> <span class="tag t" style="margin:0 0 0 4px">demo</span></div><button class="btn2" id="dclose" aria-label="Close demo">Close</button></div>
+  <div id="dview"></div>
+  <nav id="dnav" hidden></nav>
+  <div id="dsheet"></div>
+</div></div>
+
+<script>
+/* ============ 4. HELPERS ============ */
+const CONFIG={brand:'Halo',whatsapp:''};  // whatsapp e.g. '919XXXXXXXXX' (country code, no +)
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hash=s=>[...String(s)].reduce((a,c)=>a+c.charCodeAt(0),0);
+const P={
+ cup:'<path d="M5 8h11v6a5 5 0 01-5 5h-1a5 5 0 01-5-5z"/><path d="M16 9h2a2.5 2.5 0 010 5h-2M8 3v2M12 3v2"/>',
+ users:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.4"/><path d="M17 14c2.5 0 4.5 2 4.5 4.5"/>',
+ card:'<rect x="3" y="6" width="18" height="12" rx="3"/><path d="M3 10h18M7 15h4"/>',
+ shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
+ user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>',
+ check:'<path d="M5 12.5l4.5 4.5L19 7"/>',
+ warn:'<path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.5"/>',
+ dice:'<rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="15" r="1"/>',
+ brush:'<path d="M12 3a9 9 0 100 18c1.5 0 2-1 2-2s-1-2 0-3 3 0 4-1a9 9 0 00-6-12z"/><circle cx="8" cy="11" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="16" cy="11" r="1"/>',
+ map:'<path d="M9 4l6 2 5-2v14l-5 2-6-2-5 2V6z"/><path d="M9 4v14M15 6v14"/>',
+ lock:'<rect x="5" y="11" width="14" height="10" rx="3"/><path d="M8 11V8a4 4 0 018 0v3"/>',
+ flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+ ban:'<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>',
+ heart:'<path d="M12 20s-7-4.5-7-10a4 4 0 017-2.5A4 4 0 0119 10c0 5.5-7 10-7 10z"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ home:'<path d="M4 11l8-7 8 7v9H4z"/><path d="M10 20v-6h4v6"/>',
+ phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A15 15 0 013 6a2 2 0 012-2z"/>',
+ shop:'<path d="M4 9l1-5h14l1 5M4 9v11h16V9"/><path d="M4 9a3 3 0 006 0 3 3 0 006 0 3 3 0 004 0M10 20v-6h4v6"/>',
+ msg:'<path d="M4 5h16v11H9l-5 4z"/>'
+};
+const ic=n=>`<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${P[n]}</svg>`;
+function mark(sz=28){return `<svg viewBox="0 0 40 40" width="${sz}" height="${sz}" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF8A5B"/><stop offset="1" stop-color="#FFC670"/></linearGradient></defs><circle cx="20" cy="21" r="12" fill="none" stroke="url(#lg)" stroke-width="3.4"/><circle cx="31" cy="10" r="4" fill="url(#lg)"/></svg>`}
+function rnd(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^a>>>15,1|a);t=(t+Math.imul(t^t>>>7,61|t))^t;return((t^t>>>14)>>>0)/4294967296}}
+function art(seed){const r=rnd(seed),c=['#FF8A5B','#FFC670','#8B7CFF','#3DD6C6','#F4F1EC'];let s=`<rect width="100" height="100" fill="${['#14141f','#1c1830','#101a22'][Math.floor(r()*3)]}"/>`;
+ for(let i=0;i<5;i++){const col=c[Math.floor(r()*5)],x=r()*100,y=r()*100,k=8+r()*30,o=(.5+r()*.5).toFixed(2);
+  s+=r()>.5?`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${k.toFixed(1)}" fill="${col}" opacity="${o}"/>`:`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(k*1.4).toFixed(1)}" height="${k.toFixed(1)}" rx="6" fill="${col}" opacity="${o}" transform="rotate(${Math.floor(r()*90)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`}
+ return `<svg class="art" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${s}</svg>`}
+function wmk(text){const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='150' height='90'><text x='8' y='54' transform='rotate(-24 75 45)' font-family='sans-serif' font-size='13' font-weight='700' fill='white' fill-opacity='.38'>${esc(text)}</text></svg>`;
+ return `<i class="wmk" style="background-image:url('data:image/svg+xml;utf8,${encodeURIComponent(svg).replace(/'/g,'%27')}')"></i>`}
+
+/* ============ 5. LANDING SCRIPT ============ */
+$$('[data-brand]').forEach(e=>e.textContent=CONFIG.brand);document.title=CONFIG.brand+' · Meet properly';
+$$('[data-mark]').forEach(e=>e.innerHTML=mark(+e.dataset.mark));
+$('#mq').innerHTML=[...Array(2)].map(()=>['Verified 21+','Public places only','Group-first','One person, one ID','No photos in chat','Consent-only calls','Human safety team'].map(t=>`<span>${t}</span>`).join('')).join('');
+$('#safeList').innerHTML=['21+ only. Selfie-verified. One person, one ID.','Public places only, group-first meets.','No photos, video or files in chat.','Check-in timer, trusted contact and panic button.','Reports reviewed by people. Harassment means a permanent ban, with an appeal route.','Inactive for 15 days: your profile hides itself, and returns when you do.','A full Safety Hub that explains every feature in plain words.'].map(t=>`<li>${ic('check')}<span>${t}</span></li>`).join('');
+$('#featGrid').innerHTML=[['users','Saathi mode','The friend who brought you can join your first meet. Both of you must agree.'],['card','Meet Card','Show a code, tap "We met". Your ring colour changes, and you can change it back any time.'],['map','Women Travel Circles','Women travelling and exploring with other women and friends. Women-only circles.'],['brush','Art & hobby showcase','Artists and photographers show their best work. Profile photos are always your real face.'],['heart','Same-field matching','Health, tech, art, study. People from your field come first, so conversation is easy.'],['home','Neighbourhood board','Weddings, festivals, badminton, trips: plan it all in one place. Meet people nearby.'],['phone','Calls only by consent','No call connects unless both of you allow it. Harassment by phone is closed off.'],['msg','Stickers & memes','A built-in library of funny stickers. No photos or video in chat.'],['shop','Help & local directory','Police and ambulance numbers, plus local cafés and shops you can message to order.'],['cup','Healthy openers','Your three answers turn into a first question: "You both like coffee. Which kind?"']].map(([i,t,d],k)=>`<div class="card rv" style="--d:${(k%2)*.08}s"><div class="ico">${ic(i)}</div><h3>${t}</h3><p>${d}</p></div>`).join('');
+$$('[data-go]').forEach(b=>b.addEventListener('click',()=>{const t=$(b.dataset.go);if(t)t.scrollIntoView({behavior:'smooth'});if(b.dataset.role){$$('#wrole .chip').forEach(c=>c.classList.toggle('on',c.dataset.role.toLowerCase()===b.dataset.role))}}));
+$('#wrole').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;$$('#wrole .chip').forEach(c=>c.classList.toggle('on',c===b))});
+$('#wint').addEventListener('click',e=>{const b=e.target.closest('.chip');if(b)b.classList.toggle('on')});
+$('#wl').addEventListener('submit',e=>{e.preventDefault();const err=$('#werr'),out=$('#wout');err.textContent='';out.innerHTML='';
+ const n=$('#wn').value.trim(),c=$('#wc').value.trim(),a=parseInt($('#wa').value,10);
+ if(!(a>=21)){err.textContent=CONFIG.brand+' is 21+ for now. Come back when you turn 21.';return}
+ const role=($('#wrole .on')||{dataset:{role:'Member'}}).dataset.role,ints=$$('#wint .on').map(x=>x.dataset.i).join(', ')||'Not sure yet';
+ const msg=`Hi! I want to join the ${CONFIG.brand} waitlist.\nName: ${n}\nCity: ${c}\nAge: ${a}\nI am a: ${role}\nLooking for: ${ints}`;
+ if(CONFIG.whatsapp){window.open('https://wa.me/'+CONFIG.whatsapp+'?text='+encodeURIComponent(msg),'_blank','noopener');out.innerHTML=`<p class="sub" style="margin-top:12px">WhatsApp opened. Just press Send.</p>`}
+ else{out.innerHTML=`<div class="msgbox" id="wmsg">${esc(msg)}</div><p class="sub" style="margin-top:8px;font-size:14px">The founder's WhatsApp number is not set yet. Copy this message and send it.</p><button type="button" class="btnt full" id="wcopy" style="margin-top:8px">Copy message</button>`;
+  $('#wcopy').onclick=()=>{try{navigator.clipboard.writeText(msg);$('#wcopy').textContent='Copied ✓'}catch(x){}}}});
+/* scroll effects */
+(function(){const els=$$('.rv');
+ if('IntersectionObserver' in window){const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.12,rootMargin:'0px 0px -6% 0px'});els.forEach(e=>io.observe(e))}else els.forEach(e=>e.classList.add('in'));
+ const pr=$('#prog');addEventListener('scroll',()=>{const h=document.documentElement;pr.style.transform=`scaleX(${Math.min(1,scrollY/Math.max(1,h.scrollHeight-innerHeight))})`},{passive:true});
+ document.addEventListener('pointermove',e=>{const c=e.target.closest&&e.target.closest('.card');if(!c)return;const r=c.getBoundingClientRect();c.style.setProperty('--x',(e.clientX-r.left)+'px');c.style.setProperty('--y',(e.clientY-r.top)+'px')})})();
+
+/* ============ 6. DEMO DATA (all fictional, all 21+) ============ */
+const FIELDS=['Health','Tech','Art & Design','Education','Business','Student','Other'];
+const Q=[['Your ideal weekend?',['Quiet at home','Coffee & conversation','Out exploring','Games & movies']],['Friends would call you…',['Calm','Fun','Caring','Driven']],['Most important in a relationship?',['Honesty','Respect','Humour','Time']]];
+const SLOTS=[
+ {id:'s1',ic:'cup',t:'Coffee & Conversation',v:'Common Grounds Café (demo)',w:'Today · 6:00 PM · 1 hour',n:4,max:6,tags:['Friendship','Dating']},
+ {id:'s2',ic:'dice',t:'Board Games Evening',v:'Playbox Café (demo)',w:'Today · 7:30 PM · 2 hours',n:3,max:6,tags:['Friendship','Dating']},
+ {id:'s3',ic:'brush',t:'Sketch & Sip',v:'Studio Row Café (demo)',w:'Sat · 5:00 PM · 2 hours',n:5,max:8,tags:['Friendship']},
+ {id:'s4',ic:'map',t:'Old Fort Walk',v:'Fort Gate, public area (demo)',w:'Sun · 9:00 AM · full day',n:4,max:8,tags:['Friendship','Dating']}];
+const TRAVEL=[{id:'w1',t:'Weekend Trek Circle',d:'Women-only · 4 to 6 women · verified guide'},{id:'w2',t:'Temple-town Day Trip',d:'Women-only · day trip · public transport'}];
+const PEOPLE=[
+ {id:'p1',name:'Aarav M.',age:25,field:'Education',intent:['Friendship','Dating'],a:[1,2,0],note:'Teacher. Day starts with coffee.',art:false},
+ {id:'p2',name:'Meera S.',age:24,field:'Art & Design',intent:['Friendship','Dating'],a:[2,1,2],note:'Photographer. Chasing morning light.',art:true},
+ {id:'p3',name:'Kabir R.',age:27,field:'Tech',intent:['Dating','Marriage'],a:[3,3,0],note:'Developer. Board games and bad jokes.',art:false},
+ {id:'p4',name:'Naina D.',age:26,field:'Health',intent:['Friendship','Marriage'],a:[1,2,0],note:'Nurse. After a long shift I just need a good cup of tea.',art:false},
+ {id:'p5',name:'Dev P.',age:29,field:'Business',intent:['Friendship'],a:[2,0,3],note:'Run a small shop. Weekends are for trips.',art:false},
+ {id:'p6',name:'Sana K.',age:23,field:'Art & Design',intent:['Friendship','Dating'],a:[0,1,1],note:'Illustrator. Sketchbook always with me.',art:true},
+ {id:'p7',name:'Rohan T.',age:28,field:'Health',intent:['Dating','Marriage'],a:[1,2,1],note:'Doctor. Quiet places, good talk.',art:false},
+ {id:'p8',name:'Ishita B.',age:22,field:'Student',intent:['Friendship'],a:[3,1,2],note:'Final year. Games and memes.',art:false}];
+const FRIENDS=['Riya (your friend)','Karan (your friend)'];
+const WA=['Amber','Cedar','Coral','Ember','Indigo','Maple','Onyx','Sage'],WB=['Lark','Harbor','Meadow','Comet','Fable','Echo','Dune','Pine'];
+const RINGS={teal:['#3DD6C6','Open'],gold:['#FFC670','Met ✓'],rose:['#FF6B8B','Busy']};
+const CHECKS=['Told someone I trust where I am going and when','The place is public and there are other people','We have already met in a group or on video','My phone is charged and I have data','I have my own way to get there and back','I know it is okay to leave if I feel pressured'];
+const FAQ=[['Who can see my profile?','Only verified 21+ members. Your full profile is visible only to people you request or who request you. We never ask for your contacts.'],['Why no photos in chat?','Unwanted photos and blackmail mostly travel through chat. So chat is text only. A voice intro can live on your profile, not in chat.'],['What about screenshots?','The Android app blocks them. iPhone cannot be blocked, so every photo carries the viewer\'s name as a watermark. Nobody can stop a photo of a screen with another phone, so only share what you are comfortable sharing.'],['What happens when I report someone?','A person on the safety team reviews it. Harassment means a permanent ban, even with a new number or email. A wrongful ban can be appealed.'],['What happens to my ID data?','Plan: your Aadhaar number and ID photo are not stored. Only the "verified" result and a privacy-safe marker so a banned person cannot return.'],['How are women-only circles kept safe?','Verified guide, public transport or public places, small groups. How we confirm who may join women-only spaces (gender verification) is still being designed.'],['What is Saathi?','The friend who brought you can join your first meet. Both of you must agree, and the Saathi is verified too. A Saathi earns nothing from your match.']];
+const PTYPES=['Festival','Wedding','Sport','Movie','Trip','Book swap','Help'];
+const EVENTS=[
+ {id:'e1',ic:'heart',t:'Sharma family wedding (demo)',type:'Wedding',w:'Sat · 7:00 PM',v:'Lane 4 (demo)',n:12},
+ {id:'e2',ic:'users',t:'Winter Badminton League',type:'Sport',w:'Sun · 6:30 AM',v:'Community ground (demo)',n:8},
+ {id:'e3',ic:'map',t:'Durga Puja committee meet',type:'Festival',w:'Fri · 5:00 PM',v:'Pandal ground (demo)',n:21},
+ {id:'e4',ic:'dice',t:'Rooftop movie night',type:'Movie',w:'Fri · 8:00 PM',v:'Society terrace (demo)',n:6},
+ {id:'e5',ic:'brush',t:'Book swap: take one, leave one',type:'Book swap',w:'Sun · 4:00 PM',v:'Common Grounds Café (demo)',n:9}];
+const GROUPS=[
+ {id:'g1',t:'Winter Badminton',kind:'Everyone',n:6,max:10,priv:true},
+ {id:'g2',t:'Women: Chai & Chat',kind:'Women only',n:7,max:12,priv:true},
+ {id:'g3',t:'Men: Sunday Cricket',kind:'Men only',n:9,max:12,priv:true},
+ {id:'g4',t:'Neighbourhood Community',kind:'Everyone',n:48,max:200,priv:false}];
+const SEED=[{w:'Riya (demo)',t:'☕ Coffee later?',st:1},{w:'Karan (demo)',t:'🏸 Badminton tomorrow?',st:1}];
+const STICKERS=['😂 Cannot stop laughing','☕ Coffee later?','🏸 Badminton tomorrow?','🎬 Movie plan?','🙏 Thank you','🔥 Absolutely love it','🍕 Party when?','🥲 On my way','👍 Done','😴 So sleepy','🤝 Deal','🪔 Happy Diwali'];
+const EMERG=[['112','Emergency: police, fire, ambulance'],['100','Police'],['108','Ambulance'],['102','Ambulance (mother & child)'],['181','Women helpline'],['1091','Women helpline (police)'],['1930','Cyber crime helpline']];
+const SHOPS=[
+ {id:'k1',n:'Common Grounds Café (demo)',type:'Café',addr:'Station Road (demo)',ph:'98XXXXXX01',items:['Masala chai','Samosa','Sandwich']},
+ {id:'k2',n:'Sharma General Store (demo)',type:'General store',addr:'Main Chowk (demo)',ph:'98XXXXXX02',items:['Flour 5kg','Tea leaves','Biscuits']},
+ {id:'k3',n:'Community Pharmacy (demo)',type:'Pharmacy',addr:'Hospital Road (demo)',ph:'98XXXXXX03',items:['ORS','Bandage','Thermometer']},
+ {id:'k4',n:'Police Station (demo)',type:'Police station',addr:'Station Road (demo)',ph:'0XXXX-XXXXXX',items:[]}];
+
+/* ============ 7. DEMO STATE ============ */
+const DK='halo-demo-v1';
+const dFresh=()=>({step:'gate',ob:0,v:{},u:{nick:'',age:21,field:'',intent:[],a:[null,null,null],note:''},tab:'home',joined:{},notify:{},sent:{},blocked:{},meet:{},checks:{},trusted:'',ring:'teal',marital:'',safeAnswers:{},mh:'board',rsvp:{},plans:[],gjoin:{},groups:[],chat:{},calls:{},orders:{},sheet:null});
+let DS=(()=>{try{return Object.assign(dFresh(),JSON.parse(localStorage.getItem(DK)||'{}'))}catch(e){return dFresh()}})();
+DS.sheet=null;
+const dSave=()=>{try{localStorage.setItem(DK,JSON.stringify(DS))}catch(e){}};
+let TIMER=null,tickId=null,lastView='',lastSheet='';
+const initials=n=>n.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('')||'?';
+const PALS=[['#FF8A5B','#FFC670'],['#8B7CFF','#C2B8FF'],['#3DD6C6','#9CF0E6'],['#FF6B8B','#FFB3C5']];
+const av=(n,cls='',ring)=>{const[a,b]=PALS[hash(n)%PALS.length];return `<span class="av ${cls}" style="--a:${a};--b:${b};${ring?`--rc:${ring}`:''}" aria-hidden="true">${esc(initials(n))}</span>`};
+const handle=n=>'@'+String(n).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+const compat=p=>p.a.reduce((n,x,i)=>n+(DS.u.a[i]===x?1:0),0);
+function starter(p){for(let i=0;i<3;i++)if(DS.u.a[i]===p.a[i]&&DS.u.a[i]!==null){const o=Q[i][1][p.a[i]];return['You both chose "'+o+'". What does your perfect version look like?','You both said "'+o+'". Who is more so?','You both value "'+o+'". Why?'][i]}return 'Opening question: what was the best part of your day?'}
+function dToast(m){$$('.dtoast').forEach(x=>x.remove());const t=document.createElement('div');t.className='dtoast';t.textContent=m;$('.phone').appendChild(t);setTimeout(()=>t.remove(),2300)}
+const dFoot=()=>`<p class="meta" style="text-align:center;margin-top:18px">Demo · fictional people · nothing leaves your device</p>`;
+
+/* ============ 8. DEMO SCREENS ============ */
+const OBS=['Mobile OTP','Selfie check','Age & ID','Photo match','About you','3 questions'];
+function onboard(){
+ const s=DS.ob,v=DS.v,u=DS.u;let body='';
+ const nextBtn=(ok,label='Continue')=>`<button class="btn full" data-d="next" ${ok?'':'disabled'} style="margin-top:16px">${label}</button>`;
+ if(s===0)body=`<h1>Mobile OTP</h1><p class="sub">Real app: an SMS or WhatsApp code. The demo never asks for your number.</p><div class="dc" style="margin-top:14px"><div class="row">${ic('lock')}<span>One number, one account. Your number is never shown to other members.</span></div></div><button class="btnt full" data-d="ver" data-v="otp">${v.otp?'Verified ✓':'Simulate OTP'}</button>${nextBtn(v.otp)}`;
+ if(s===1)body=`<h1>Selfie check</h1><p class="sub">Real app: a live selfie (liveness check) through a vendor. The demo captures nothing.</p><div class="dc" style="margin-top:14px"><p>This proves you are a real, live person and not a photo.</p></div><button class="btnt full" data-d="ver" data-v="selfie">${v.selfie?'Selfie verified ✓':'Simulate selfie check'}</button>${nextBtn(v.selfie)}`;
+ if(s===2)body=`<h1>Age & ID</h1><p class="sub">Planned: through DigiLocker, with your consent. Your Aadhaar number is not stored.</p><div class="dc" style="margin-top:14px"><p>This only confirms you are 21 or older. Only the "verified" result is kept.</p></div><button class="btnt full" data-d="ver" data-v="id">${v.id?'21+ verified ✓':'Simulate DigiLocker check'}</button>${nextBtn(v.id)}`;
+ if(s===3)body=`<h1>Photo match</h1><p class="sub">Your profile photo must be your own real face. Downloaded photos do not pass.</p>
+  ${v.photo==='bad'?`<div class="dc" style="border-color:var(--ro)"><p style="font-size:18px">😠 That does not look like you. Please use your own face.</p></div>`:''}
+  ${v.photo==='ok'?`<div class="dc" style="border-color:var(--mi)"><p>${ic('check')} Face matched.</p></div>`:''}
+  <div style="display:flex;gap:8px"><button class="btnr grow" data-d="photo" data-v="bad">Someone else's photo</button><button class="btnt grow" data-d="photo" data-v="ok">My own photo</button></div>${nextBtn(v.photo==='ok')}`;
+ if(s===4)body=`<h1>About you</h1><p class="sub">Pick your field. You will meet people from it first.</p><label>Field</label><div class="chips">${FIELDS.map(f=>`<button class="chip ${u.field===f?'on':''}" data-d="field" data-v="${esc(f)}">${esc(f)}</button>`).join('')}</div><label>What are you looking for? (one or more)</label><div class="chips">${['Friendship','Dating','Marriage'].map(f=>`<button class="chip ${u.intent.includes(f)?'on':''}" data-d="intent" data-v="${f}">${f}</button>`).join('')}</div>${nextBtn(u.field&&u.intent.length)}`;
+ if(s===5)body=`<h1>Three quick questions</h1><p class="sub">They make the first conversation easy.</p>${Q.map(([q,o],i)=>`<label>${q}</label><div class="chips">${o.map((t,j)=>`<button class="chip ${u.a[i]===j?'on':''}" data-d="ans" data-q="${i}" data-v="${j}">${t}</button>`).join('')}</div>`).join('')}<label for="dnote">One thing people do not know at first</label><input id="dnote" maxlength="80" value="${esc(u.note)}" placeholder="A short answer">${nextBtn(u.a.every(x=>x!==null),'Start the demo')}`;
+ return `<div class="dots">${OBS.map((_,i)=>`<i class="${i<=s?'on':''}"></i>`).join('')}</div>${body}${dFoot()}`;
+}
+function homeTab(){
+ return `<h1>Today's meetups</h1><p class="sub">Group-first, in public places. You are here for: ${DS.u.intent.map(esc).join(', ')}.</p><div style="height:12px"></div>
+ ${SLOTS.map(s=>{const j=DS.joined[s.id];return `<div class="dc"><div class="row"><div style="color:var(--co)">${ic(s.ic)}</div><div class="grow"><h3>${s.t}</h3><div class="meta">${s.v}</div><div class="meta">${s.w}</div></div></div>
+  <div>${s.tags.map(t=>`<span class="tag">${t}</span>`).join('')}<span class="tag t">${s.n+(j?1:0)}/${s.max} going</span></div>
+  <button class="${j?'btnt':'btn'} full" style="margin-top:12px" data-d="join" data-id="${s.id}">${j?'Joined ✓ (Card is in the Meet tab)':'Join'}</button></div>`}).join('')}
+ <h2 style="font-size:32px;margin-top:22px">Women Travel Circles</h2><p class="sub" style="margin-bottom:12px">For women, exploring with women and friends.</p>
+ ${TRAVEL.map(t=>`<div class="dc"><h3>${t.t}</h3><div class="meta">${t.d}</div><button class="${DS.notify[t.id]?'btnt':'btn2'} full" style="margin-top:12px" data-d="notify" data-id="${t.id}">${DS.notify[t.id]?'On the notify list ✓':'Notify me'}</button></div>`).join('')}
+ <p class="meta">How we confirm who may join women-only spaces (gender verification) is still being designed.</p>${dFoot()}`;
+}
+function callUI(p){const c=DS.calls[p.id];
+ if(!c)return `<div style="margin-top:8px"><button class="btn2 full" data-d="callask" data-id="${p.id}">${ic('phone')}Ask to call</button><p class="meta" style="margin-top:5px">A call connects only if both of you allow it.</p></div>`;
+ if(c==='ask')return `<div style="margin-top:8px"><p class="meta">Request sent. No call is possible until they allow it.</p><button class="btnt full" style="margin-top:6px" data-d="callok" data-id="${p.id}">Demo: ${esc(p.name)} allowed the call</button></div>`;
+ return `<div style="margin-top:8px"><p class="meta" style="color:var(--mi)">${ic('check')} Calls allowed (demo). Either of you can switch it off any time.</p><button class="btn2 full" style="margin-top:6px" data-d="calloff" data-id="${p.id}">Turn calls off</button></div>`}
+function peopleTab(){
+ const list=PEOPLE.filter(p=>!DS.blocked[p.id]).sort((a,b)=>(b.field===DS.u.field)-(a.field===DS.u.field)||compat(b)-compat(a));
+ return `<h1>People</h1><p class="sub">Verified, 21+. Your field comes first.</p><div style="height:12px"></div>`+(list.map(p=>{const c=compat(p),same=p.field===DS.u.field;
+  return `<div class="dc"><div class="row">${av(p.name)}<div class="grow"><div style="font-weight:600">${esc(p.name)}, ${p.age}</div><div class="meta">${handle(p.name)} · ${esc(p.field)}${same?' · <span style="color:var(--mi);font-weight:600">Same field ✓</span>':''}</div></div></div>
+  <div>${p.intent.map(t=>`<span class="tag">${t}</span>`).join('')}<span class="tag t">${c}/3 answers match</span></div>
+  <p style="margin:10px 0 2px;font-size:14.5px">${esc(p.note)}</p><p class="meta">💬 ${esc(starter(p))}</p>
+  ${p.art?`<div class="artrow">${[1,2,3].map(k=>`<div class="wm">${art(hash(p.name)*7+k)}${wmk(DS.u.nick)}</div>`).join('')}</div>`:''}
+  <div style="display:flex;gap:8px;margin-top:12px"><button class="${DS.sent[p.id]?'btnt':'btn'} grow" data-d="req" data-id="${p.id}" ${DS.sent[p.id]?'disabled':''}>${DS.sent[p.id]?'Request sent ✓':'Meetup request'}</button></div>${callUI(p)}
+  <div style="display:flex;justify-content:flex-end;gap:4px;margin-top:8px"><button class="btn2" style="min-height:36px;padding:4px 12px;font-size:13px;border:0;background:none;color:var(--mu)" data-d="report" data-id="${p.id}">${ic('flag')}Report</button><button class="btn2" style="min-height:36px;padding:4px 12px;font-size:13px;border:0;background:none;color:var(--mu)" data-d="block" data-id="${p.id}">${ic('ban')}Block</button></div></div>`}).join('')||`<p class="meta">Nobody left.</p>`)+dFoot();
+}
+function mohallaTab(){
+ const m=DS.mh,subs=[['board','Board'],['groups','Groups'],['madad','Help'],['shop','Local']];let body='';
+ if(m==='board'){const all=[...DS.plans,...EVENTS];
+  body=`<p class="sub">Weddings, festivals, sport, trips or any plan. All in one place.</p><div style="height:12px"></div><button class="btn full" data-d="newplan">${ic('plus')}Create a plan</button><div style="height:14px"></div>`+all.map(e=>{const g=DS.rsvp[e.id];
+   return `<div class="dc"><div class="row"><div style="color:var(--co)">${ic(e.ic||'users')}</div><div class="grow"><h3>${esc(e.t)}</h3><div class="meta">${esc(e.w)} · ${esc(e.v)}</div></div></div><div><span class="tag">${esc(e.type)}</span><span class="tag t">${e.n+(g?1:0)} going</span></div><button class="${g?'btnt':'btn'} full" style="margin-top:12px" data-d="rsvp" data-id="${e.id}">${g?"I'm going ✓":"I'll be there"}</button></div>`}).join('')}
+ if(m==='groups'){const all=[...DS.groups,...GROUPS];
+  body=`<p class="sub">Private groups stay small. The creator picks the size.</p><div style="height:12px"></div><button class="btn full" data-d="newgroup">${ic('plus')}New group</button><div style="height:14px"></div>`+all.map(g=>{const j=DS.gjoin[g.id],n=g.n+(j?1:0),full=!j&&n>=g.max;
+   return `<div class="dc"><div class="row"><div class="grow"><h3>${esc(g.t)}</h3><div class="meta">${esc(g.kind)} · ${g.priv?'Private':'Community'}</div></div><span class="tag t">${n}/${g.max}</span></div><div style="display:flex;gap:8px;margin-top:12px"><button class="${j?'btnt':'btn'} grow" data-d="gjoin" data-id="${g.id}" ${full?'disabled':''}>${j?'Joined ✓':full?'Full':'Join'}</button>${j?`<button class="btn2 grow" data-d="gopen" data-id="${g.id}">${ic('msg')}Chat</button>`:''}</div></div>`}).join('')+`<p class="meta">How we confirm who may join women-only or men-only groups (gender verification) is still being designed.</p>`}
+ if(m==='madad')body=`<p class="sub">When you need help fast. Tap to call.</p><div style="height:12px"></div><div class="dc">${EMERG.map(([n,t])=>`<div class="row" style="padding:9px 0"><div class="grow"><b style="font-size:20px">${n}</b><div class="meta">${t}</div></div><a class="btn" style="text-decoration:none;min-height:42px;padding:8px 16px;border-radius:14px;font-weight:600;display:inline-flex;align-items:center;gap:6px;color:#1a0f08;background:var(--g)" href="tel:${n}">${ic('phone')}Call</a></div>`).join('')}</div>
+  <div class="dc"><h3>Near you (demo)</h3><div class="row" style="margin-top:10px"><div class="grow"><b>Police Station (demo)</b><div class="meta">Station Road · 0XXXX-XXXXXX</div></div></div><div class="row" style="margin-top:10px"><div class="grow"><b>District Hospital (demo)</b><div class="meta">Hospital Road · 0XXXX-XXXXXX</div></div></div></div>
+  <p class="meta">Report online fraud at cybercrime.gov.in. Numbers can differ by state, and will be verified against official sources before launch.</p>`;
+ if(m==='shop')body=`<p class="sub">Cafés, shops, pharmacies and police stations. See the location and phone, or message to order. No payment in the app: you pay at the shop.</p><div style="height:12px"></div>`+SHOPS.map(sh=>{const o=DS.orders[sh.id];
+  return `<div class="dc"><div class="row"><div style="color:var(--co)">${ic('shop')}</div><div class="grow"><h3>${esc(sh.n)}</h3><div class="meta">${esc(sh.type)} · ${esc(sh.addr)}</div><div class="meta">${esc(sh.ph)}</div></div></div>${sh.items.length?`<button class="btn full" style="margin-top:12px" data-d="shopdm" data-id="${sh.id}">${ic('msg')}Message to order</button>`:`<p class="meta" style="margin-top:8px">Information only. In an emergency call 112.</p>`}${o?`<p class="meta" style="margin-top:10px">${esc(o.items.join(', '))}: ${o.status==='sent'?'sent, waiting for the shop to reply.':'<b style="color:var(--mi)">ready. Collect it and pay at the shop.</b>'}</p>${o.status==='sent'?`<button class="btnt full" style="margin-top:6px" data-d="orderok" data-id="${sh.id}">Demo: shop accepted</button>`:''}`:''}</div>`}).join('')+`<p class="meta">Pharmacies list non-prescription items only. Prescription medicines need the prescription shown in the shop.</p>`;
+ return `<h1>Neighbourhood</h1><div class="chips" style="margin:10px 0 16px">${subs.map(([k,t])=>`<button class="chip ${m===k?'on':''}" data-d="mh" data-v="${k}">${t}</button>`).join('')}</div>${body}${dFoot()}`}
+function meetTab(){
+ const ids=SLOTS.filter(s=>DS.joined[s.id]);
+ if(!ids.length)return `<h1>Meet Card</h1><div class="dc" style="margin-top:14px"><p>Join a meetup first (Meetups tab). Your Meet Card will appear here.</p></div>${dFoot()}`;
+ return `<h1>Meet Card</h1><p class="sub" style="margin-bottom:14px">At the venue, show each other your code.</p>`+ids.map(s=>{const m=DS.meet[s.id]||{status:'none'},h=hash(s.id+DS.u.nick),code=WA[h%8]+'-'+WB[(h>>3)%8];
+  return `<div class="mcard ${m.status==='done'?'done':''}"><div class="meta">${s.t} · ${s.v}</div><div class="meta">${s.w}</div><div class="code">${code}</div>
+  ${m.status==='none'?`<p class="meta">When everyone has arrived, tap "We met".</p><button class="btn full" style="margin-top:12px" data-d="met" data-id="${s.id}">We met ✓</button>`:''}
+  ${m.status==='wait'?`<p class="meta">Waiting for the others to confirm…</p><button class="btnt full" style="margin-top:12px" data-d="metdone" data-id="${s.id}">Demo: everyone confirmed</button>`:''}
+  ${m.status==='done'?`<p style="color:var(--mi);font-weight:600">${ic('check')} Meet verified. Your ring is now gold.</p>
+   <p class="meta" style="margin-top:12px">Did you feel safe? (only the safety team sees this)</p><div class="chips">${[['yes','Yes, felt safe'],['no','There was a problem'],['skip','Skip']].map(([k,t])=>`<button class="chip ${DS.safeAnswers[s.id]===k?'on':''}" data-d="safe" data-id="${s.id}" data-v="${k}">${t}</button>`).join('')}</div>
+   ${DS.safeAnswers[s.id]==='no'?`<p class="meta" style="margin-top:8px;color:var(--ro)">The safety team has been told (demo). You can report at any time.</p>`:''}
+   <p class="meta" style="margin-top:14px">Your ring colour (change it any time):</p><div class="ring">${Object.entries(RINGS).map(([k,[c,t]])=>`<button class="${DS.ring===k?'on':''}" style="--c:${c}" data-d="ring" data-v="${k}">${t}</button>`).join('')}</div>`:''}</div>`}).join('')+dFoot();
+}
+function safetyTab(){
+ const done=CHECKS.filter((_,i)=>DS.checks[i]).length,t=TIMER;
+ return `<h1>Safety Hub</h1><p class="sub" style="margin-bottom:14px">Every feature in plain words. Read first, then meet.</p>
+ <div class="dc"><h3>Before your first meet</h3><div class="bar2"><i style="width:${done/CHECKS.length*100}%"></i></div>
+ ${CHECKS.map((c,i)=>`<button class="check2 ${DS.checks[i]?'on':''}" data-d="chk" data-id="${i}"><span class="box">${DS.checks[i]?ic('check'):''}</span><span>${c}</span></button>`).join('')}</div>
+ <div class="dc"><h3>Check-in timer</h3><p class="meta">If you do not tap "I'm safe" when time runs out, your trusted contact is alerted (demo).</p>
+ ${t&&!t.expired?`<div class="big" id="ct">--:--</div><button class="btn full" data-d="safeok">I'm safe ✓</button>`:t&&t.expired?`<p style="color:var(--ro);font-weight:600;margin:10px 0">An alert would now go to ${esc(DS.trusted||'your trusted contact')} and the safety team (demo).</p><button class="btnt full" data-d="safeok">Reset</button>`:`<div class="chips" style="margin-top:8px">${[1,30,60,120].map(m=>`<button class="chip" data-d="timer" data-v="${m}">${m===1?'1 min (demo)':m+' min'}</button>`).join('')}</div>`}</div>
+ <div class="dc"><h3>Trusted contact</h3><p class="meta" style="margin-bottom:8px">Name only. The demo does not ask for a number.</p><input id="dtrust" maxlength="30" value="${esc(DS.trusted)}" placeholder="For example: Sister"><button class="btnt full" style="margin-top:8px" data-d="trust">Save</button></div>
+ <button class="sos" data-d="panic">${ic('warn')} Panic button (demo)</button>
+ <h2 style="font-size:32px;margin:24px 0 8px">Common questions</h2><div class="dc">${FAQ.map(([q,a])=>`<details><summary>${q}</summary><p>${a}</p></details>`).join('')}</div>
+ <p class="meta">Helpline numbers will be listed here, verified from official sources.</p>${dFoot()}`;
+}
+function meTab(){
+ const u=DS.u,wantsM=u.intent.includes('Marriage'),rc=RINGS[DS.ring][0],cnt=3,next=5;
+ return `<h1>You</h1>
+ <div class="dc" style="text-align:center;margin-top:12px">${av(u.nick,'xl',rc)}<div style="font-weight:600;font-size:18px">${esc(u.nick)}, ${u.age}</div><div class="meta">${handle(u.nick)} · ${esc(u.field)} · ring: ${RINGS[DS.ring][1]}</div>
+ <div>${u.intent.map(t=>`<span class="tag">${t}</span>`).join('')}</div><p class="meta" style="margin-top:8px">${esc(u.note||'')}</p>
+ <div style="margin-top:8px"><span class="tag t">OTP ✓</span><span class="tag t">Selfie ✓</span><span class="tag t">21+ ✓</span><span class="tag t">Face match ✓</span></div></div>
+ <div class="dc"><h3>Art showcase</h3><div class="artrow">${[11,12,13].map(k=>`<div class="wm">${art(hash(u.nick)*3+k)}${wmk(u.nick)}</div>`).join('')}</div><p class="meta" style="margin-top:8px">No uploads in the demo. In the real app you show your best work, watermarked with the viewer's name.</p></div>
+ <div class="dc"><h3>Invite & Creator Circle</h3><p class="meta">Your code</p><div class="code" style="font-size:32px">${CONFIG.brand.toUpperCase().slice(0,5)}-${(hash(u.nick)*977%9000+1000)}</div>
+ <p class="meta">${cnt}/${next} verified, active members → 1 month free</p><div class="bar2"><i style="width:${cnt/next*100}%"></i></div><p class="meta">No payment per match. Fake or reported accounts do not count.</p></div>
+ <div class="dc"><h3>Saathi (a friend who joins)</h3><p class="meta">The friend who brought you can join your first meet, if you both agree. They are verified too.</p>${FRIENDS.map(f=>`<div class="row" style="margin-top:10px">${av(f)}<div class="grow">${esc(f)}</div><span class="tag t">verified</span></div>`).join('')}</div>
+ <div class="dc" style="${wantsM?'border-color:rgba(255,198,112,.5)':''}"><h3>Marriage mode ${wantsM?'':'(locked)'}</h3>
+ ${wantsM?`<p class="meta">Both people must be 21+ and verified. Friendship first, then everything else.</p>
+ <label>Your marital status</label><div class="chips">${['Single','Divorced','Widowed'].map(m=>`<button class="chip ${DS.marital===m?'on':''}" data-d="marital" data-v="${m}">${m}</button>`).join('')}</div><p class="meta" style="margin-top:8px">False information breaks our Terms and means an immediate ban.</p>
+ <details style="margin-top:12px"><summary>Court marriage guide</summary><p><b>Special Marriage Act, 1954:</b> the groom must be at least 21 and the bride at least 18 (our app policy: both 21+). You give written notice to the Marriage Officer of the district where at least one of you has lived for 30 days. The notice is displayed publicly for 30 days, during which objections can be raised. The marriage must happen within 3 months of the notice. No change of religion is needed.</p><p><b>Note:</b> the notice is public, and some couples face pressure from family. Speak to a lawyer first. This is information, not legal advice. Verified lawyers will be listed later.</p></details>`:`<p class="meta">Marriage mode unlocks when you pick "Marriage" as an intent. You picked: ${u.intent.map(esc).join(', ')}.</p>`}</div>
+ <button class="btn2 full" data-d="reset">Reset demo</button>${dFoot()}`;
+}
+const DTABS=[['home','cup','Meetups'],['mohalla','home','Local'],['people','users','People'],['meet','card','Meet'],['safety','shield','Safety'],['me','user','You']];
+function dRender(){
+ const v=$('#dview'),nav=$('#dnav'),y=v.scrollTop;let html;
+ if(DS.step==='gate'){nav.hidden=true;html=`<h1>Welcome to the demo</h1><p class="sub">21+ only. Use a nickname, not your real name.</p><div style="height:14px"></div>
+  <form id="dgate" class="dc" autocomplete="off"><label for="gn" style="margin-top:0">Nickname</label><input id="gn" maxlength="24" required><label for="ga">Age</label><input id="ga" type="number" inputmode="numeric" min="1" max="99" required>
+  <label class="check"><input type="checkbox" required><span>This is a demo with fictional people. I will not enter real personal information.</span></label><div class="err" id="gerr" role="alert"></div><button class="btn full" style="margin-top:16px">Continue</button></form>${dFoot()}`}
+ else if(DS.step==='onb'){nav.hidden=true;html=onboard()}
+ else{nav.hidden=false;html={home:homeTab,mohalla:mohallaTab,people:peopleTab,meet:meetTab,safety:safetyTab,me:meTab}[DS.tab]();
+  nav.innerHTML=DTABS.map(([k,i,t])=>`<button class="${DS.tab===k?'on':''}" data-d="tab" data-v="${k}" aria-label="${t}">${ic(i)}${t}</button>`).join('')}
+ v.innerHTML=html;
+ const key=DS.step+'|'+DS.tab+'|'+DS.ob+'|'+DS.mh;
+ if(key!==lastView){lastView=key;v.scrollTop=0;[...v.children].forEach((c,i)=>c.style.setProperty('--i',Math.min(i,9)));v.classList.remove('enter');void v.offsetWidth;v.classList.add('enter')}
+ else{v.classList.remove('enter');v.scrollTop=y}
+ renderSheet();tick();
+}
+function renderSheet(){
+ const el=$('#dsheet'),s=DS.sheet;if(!s){el.innerHTML='';lastSheet='';return}let body='';
+ const sk=s.k+(s.id||'');
+ if(s.k==='req'){const p=PEOPLE.find(x=>x.id===s.id);body=`<h3 style="font-size:19px">Meetup request: ${esc(p.name)}</h3><p class="meta">Group-first: first meets happen in groups of 4 to 6.</p>
+  <label>Which meetup?</label><div class="chips">${SLOTS.map(x=>`<button class="chip ${s.slot===x.id?'on':''}" data-d="sheetslot" data-v="${x.id}">${x.t}</button>`).join('')}</div>
+  <label>Saathi (bring a friend)?</label><button class="check2 ${s.saathi?'on':''}" data-d="saathi"><span class="box">${s.saathi?ic('check'):''}</span><span>I want a friend to come along</span></button>
+  ${s.saathi?`<div class="chips">${FRIENDS.map((f,i)=>`<button class="chip ${s.friend===i?'on':''}" data-d="friend" data-v="${i}">${esc(f)}</button>`).join('')}</div><p class="meta" style="margin-top:8px">Both of you must agree, and the Saathi is verified too. A Saathi earns nothing from your match.</p>`:''}
+  <button class="btn full" style="margin-top:16px" data-d="sendreq" ${s.slot?'':'disabled'}>Send request</button><button class="btn2 full" style="margin-top:8px" data-d="closesheet">Cancel</button>`}
+ if(s.k==='report'){const p=PEOPLE.find(x=>x.id===s.id);body=`<h3 style="font-size:19px">Report ${esc(p.name)}</h3><p class="meta">Reports are private. In the real app, a person on the safety team reviews them.</p>${['Unkind or bullying','Fake or spam profile','Inappropriate content','I do not feel safe','Something else'].map(r=>`<button class="btn2 full" style="margin-top:8px;justify-content:flex-start" data-d="reason" data-v="${esc(r)}">${r}</button>`).join('')}<button class="btnr full" style="margin-top:14px" data-d="block" data-id="${s.id}">${ic('ban')}Block instead</button><button class="btn2 full" style="margin-top:8px" data-d="closesheet">Cancel</button>`}
+ if(s.k==='panic')body=`<h3 style="font-size:19px;color:var(--ro)">Panic button (demo)</h3><p style="margin:8px 0">In the real app, pressing this would:</p><ul class="list"><li>${ic('check')}<span>Alert ${esc(DS.trusted||'your trusted contact')} with your live location</span></li><li>${ic('check')}<span>Alert the safety team at once</span></li><li>${ic('check')}<span>Show nearby public places to get help</span></li></ul><p class="meta">Nothing was sent in this demo. In a real emergency call 112.</p><button class="btn full" style="margin-top:14px" data-d="closesheet">OK</button>`;
+ if(!body)body=mohallaSheet(s);
+ el.innerHTML=`<div class="bg ${sk!==lastSheet?'anim':''}" data-d="closebg"><div class="sh">${body}</div></div>`;lastSheet=sk;
+}
+function mohallaSheet(s){
+ if(s.k==='plan')return `<h3 style="font-size:19px">Create a plan</h3><label>What is the plan?</label><input data-f="title" maxlength="50" value="${esc(s.title||'')}" placeholder="For example: Sunday badminton"><label>Type</label><div class="chips">${PTYPES.map(t=>`<button class="chip ${s.type===t?'on':''}" data-d="plantype" data-v="${t}">${t}</button>`).join('')}</div><label>When? (day and time)</label><input data-f="when" maxlength="30" value="${esc(s.when||'')}" placeholder="Sun 6:30 AM"><label>Where?</label><input data-f="where" maxlength="40" value="${esc(s.where||'')}" placeholder="A public place"><p class="meta" style="margin-top:8px">Pick a public place. Never post a home address.</p><button class="btn full" style="margin-top:14px" data-d="pubplan">Publish</button><button class="btn2 full" style="margin-top:8px" data-d="closesheet">Cancel</button>`;
+ if(s.k==='group'){const sizes=s.vis==='Private'?[4,6,8,12]:[25,50,100,200];
+  return `<h3 style="font-size:19px">New group</h3><label>Group name</label><input data-f="title" maxlength="40" value="${esc(s.title||'')}" placeholder="For example: Sunday Cricket"><label>Who can join?</label><div class="chips">${['Everyone','Women only','Men only'].map(t=>`<button class="chip ${s.kind===t?'on':''}" data-d="gkind" data-v="${t}">${t}</button>`).join('')}</div><label>Private or community</label><div class="chips">${['Private','Community'].map(t=>`<button class="chip ${s.vis===t?'on':''}" data-d="gvis" data-v="${t}">${t}</button>`).join('')}</div><label>Maximum members (you choose)</label><div class="chips">${sizes.map(n=>`<button class="chip ${s.size===n?'on':''}" data-d="gsize" data-v="${n}">${n}</button>`).join('')}</div><button class="btn full" style="margin-top:16px" data-d="pubgroup">Create group</button><button class="btn2 full" style="margin-top:8px" data-d="closesheet">Cancel</button>`}
+ if(s.k==='chat'){const g=[...DS.groups,...GROUPS].find(x=>x.id===s.id),msgs=DS.chat[s.id]||SEED;
+  return `<h3 style="font-size:19px">${esc(g.t)}</h3><p class="meta">Text and stickers only. No photos, video or files.</p><div style="margin:8px 0">${msgs.map(m=>{const me=m.w==='me',i=m.t.indexOf(' ');return `<div class="bub ${me?'me':''}">${me?'':`<div class="meta">${esc(m.w)}</div>`}${m.st?`<div style="font-size:32px;line-height:1.1">${esc(m.t.slice(0,i))}</div><div style="font-size:13px">${esc(m.t.slice(i+1))}</div>`:esc(m.t)}</div>`}).join('')}</div><div class="stk">${STICKERS.map(t=>`<button data-d="stk" data-v="${esc(t)}">${esc(t)}</button>`).join('')}</div><div style="display:flex;gap:8px;margin-top:6px"><input data-f="msg" maxlength="200" value="${esc(s.msg||'')}" placeholder="Write a message" style="flex:1"><button class="btn" data-d="sendmsg" aria-label="Send">${ic('msg')}</button></div><button class="btn2 full" style="margin-top:10px" data-d="closesheet">Close</button>`}
+ if(s.k==='order'){const sh=SHOPS.find(x=>x.id===s.id);
+  return `<h3 style="font-size:19px">${esc(sh.n)}</h3><p class="meta">Order by message. No payment in the app: you pay at the shop.</p><label>What do you need?</label><div class="chips">${sh.items.map(t=>`<button class="chip ${s.sel[t]?'on':''}" data-d="shopsel" data-v="${esc(t)}">${esc(t)}</button>`).join('')}</div><button class="btn full" style="margin-top:16px" data-d="sendorder">Send order</button><button class="btn2 full" style="margin-top:8px" data-d="closesheet">Cancel</button>`}
+ return ''}
+function tick(){clearInterval(tickId);const e=$('#ct');if(!TIMER||TIMER.expired||!e)return;
+ const upd=()=>{const left=Math.max(0,Math.round((TIMER.end-Date.now())/1000));const el=$('#ct');if(!el){clearInterval(tickId);return}
+  el.textContent=String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');if(left<=0){TIMER.expired=true;clearInterval(tickId);dRender()}};
+ upd();tickId=setInterval(upd,1000)}
+
+/* ============ 9. DEMO EVENTS ============ */
+function openDemo(){$('#demo').hidden=false;document.body.style.overflow='hidden';lastView='';dRender()}
+function closeDemo(){$('#demo').hidden=true;document.body.style.overflow='';clearInterval(tickId)}
+$$('[data-open-demo]').forEach(b=>b.addEventListener('click',openDemo));
+$('#dclose').addEventListener('click',closeDemo);
+$('#demo').addEventListener('input',e=>{const f=e.target.dataset&&e.target.dataset.f;if(f&&DS.sheet)DS.sheet[f]=e.target.value});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#demo').hidden){if(DS.sheet){DS.sheet=null;renderSheet()}else closeDemo()}});
+$('#demo').addEventListener('click',e=>{
+ const b=e.target.closest('[data-d]');if(!b)return;const a=b.dataset.d,id=b.dataset.id,val=b.dataset.v;
+ if(a==='closebg'){if(e.target===b){DS.sheet=null;renderSheet()}return}
+ if(a==='closesheet'){DS.sheet=null;renderSheet();return}
+ if(a==='tab'){DS.tab=val}
+ else if(a==='ver'){DS.v[val]=1}
+ else if(a==='photo'){DS.v.photo=val}
+ else if(a==='next'){if(DS.ob<5)DS.ob++;else{DS.u.note=($('#dnote')||{value:DS.u.note}).value.trim();DS.step='app';DS.tab='home'}}
+ else if(a==='field'){DS.u.field=val}
+ else if(a==='intent'){const i=DS.u.intent.indexOf(val);i<0?DS.u.intent.push(val):DS.u.intent.splice(i,1)}
+ else if(a==='ans'){DS.u.a[+b.dataset.q]=+val;const n=$('#dnote');if(n)DS.u.note=n.value}
+ else if(a==='join'){DS.joined[id]=!DS.joined[id];if(DS.joined[id]){DS.meet[id]=DS.meet[id]||{status:'none'};dToast('Joined. Your Meet Card is in the Meet tab.')}}
+ else if(a==='notify'){DS.notify[id]=!DS.notify[id]}
+ else if(a==='req'){DS.sheet={k:'req',id,slot:null,saathi:false,friend:0}}
+ else if(a==='sheetslot'){DS.sheet.slot=val}
+ else if(a==='saathi'){DS.sheet.saathi=!DS.sheet.saathi}
+ else if(a==='friend'){DS.sheet.friend=+val}
+ else if(a==='sendreq'){DS.sent[DS.sheet.id]={slot:DS.sheet.slot,saathi:DS.sheet.saathi};DS.sheet=null;dToast('Request sent (demo). First meets are in groups.')}
+ else if(a==='report'){DS.sheet={k:'report',id}}
+ else if(a==='reason'){DS.sheet=null;dToast(val==='I do not feel safe'?'Report sent. Please also tell someone you trust.':'Report sent (demo). Thank you.')}
+ else if(a==='block'){DS.blocked[id]=true;DS.sheet=null;dToast('Blocked (demo)')}
+ else if(a==='met'){DS.meet[id]={status:'wait'}}
+ else if(a==='metdone'){DS.meet[id]={status:'done'};DS.ring='gold'}
+ else if(a==='safe'){DS.safeAnswers[id]=val}
+ else if(a==='ring'){DS.ring=val}
+ else if(a==='chk'){DS.checks[id]=!DS.checks[id]}
+ else if(a==='timer'){const m=+val;TIMER={end:Date.now()+(m===1?60:m*60)*1000,expired:false}}
+ else if(a==='safeok'){TIMER=null;dToast('Glad you are safe ✓')}
+ else if(a==='trust'){DS.trusted=($('#dtrust')||{value:''}).value.trim();dToast('Saved')}
+ else if(a==='panic'){DS.sheet={k:'panic'}}
+ else if(a==='marital'){DS.marital=val}
+ else if(a==='mh'){DS.mh=val}
+ else if(a==='rsvp'){DS.rsvp[id]=!DS.rsvp[id]}
+ else if(a==='newplan'){DS.sheet={k:'plan',type:'',title:'',when:'',where:''}}
+ else if(a==='plantype'){DS.sheet.type=val}
+ else if(a==='pubplan'){const q=DS.sheet;if(!q.title.trim()||!q.type||!q.when.trim()){dToast('Add a name, a type and a time');return}
+  DS.plans.unshift({id:'u'+Date.now(),t:q.title.trim(),type:q.type,w:q.when.trim(),v:(q.where||'').trim()||'Place to be decided',n:0,ic:'users'});DS.sheet=null;dToast('Plan published (demo)')}
+ else if(a==='newgroup'){DS.sheet={k:'group',title:'',kind:'Everyone',vis:'Private',size:6}}
+ else if(a==='gkind'){DS.sheet.kind=val}
+ else if(a==='gvis'){DS.sheet.vis=val;DS.sheet.size=val==='Private'?6:50}
+ else if(a==='gsize'){DS.sheet.size=+val}
+ else if(a==='pubgroup'){const q=DS.sheet;if(!q.title.trim()){dToast('Give the group a name');return}
+  const gid='ug'+Date.now();DS.groups.unshift({id:gid,t:q.title.trim(),kind:q.kind,n:0,max:q.size,priv:q.vis==='Private'});DS.gjoin[gid]=true;DS.sheet=null;dToast('Group created (demo)')}
+ else if(a==='gjoin'){DS.gjoin[id]=!DS.gjoin[id]}
+ else if(a==='gopen'){DS.sheet={k:'chat',id,msg:''}}
+ else if(a==='stk'){DS.chat[DS.sheet.id]=[...(DS.chat[DS.sheet.id]||SEED),{w:'me',t:val,st:1}]}
+ else if(a==='sendmsg'){const q=DS.sheet,t=(q.msg||'').trim();if(!t)return;DS.chat[q.id]=[...(DS.chat[q.id]||SEED),{w:'me',t}];q.msg=''}
+ else if(a==='callask'){DS.calls[id]='ask'}
+ else if(a==='callok'){DS.calls[id]='ok'}
+ else if(a==='calloff'){delete DS.calls[id]}
+ else if(a==='shopdm'){DS.sheet={k:'order',id,sel:{}}}
+ else if(a==='shopsel'){DS.sheet.sel[val]=!DS.sheet.sel[val]}
+ else if(a==='sendorder'){const q=DS.sheet,it=Object.keys(q.sel).filter(k=>q.sel[k]);if(!it.length){dToast('Pick at least one item');return}DS.orders[q.id]={items:it,status:'sent'};DS.sheet=null;dToast('Order sent (demo)')}
+ else if(a==='orderok'){DS.orders[id].status='ok'}
+ else if(a==='reset'){DS=dFresh();TIMER=null}
+ dSave();dRender();
+});
+$('#demo').addEventListener('submit',e=>{e.preventDefault();
+ if(e.target.id==='dgate'){const n=$('#gn').value.trim(),a=parseInt($('#ga').value,10),er=$('#gerr');
+  if(!n){er.textContent='Please enter a nickname.';return}
+  if(!(a>=21)){er.textContent='This demo is for 21 and over.';return}
+  DS=dFresh();DS.u.nick=n;DS.u.age=a;DS.step='onb';dSave();dRender()}});
+</script>
+</body>
+</html>
